@@ -71,54 +71,29 @@ export async function addContact(name, email, phone) {
   }
 }
 
-// export async function updateContact(contactId, updatedData) {
-//   try {
-//     const contacts = await readFileContacts();
-//     const contactIndex = contacts.findIndex(
-//       (contact) => contact.id === contactId
-//     );
+export async function updateContact(contactId, data) {
+  try {
+    const contacts = await readFileContacts();
+    const index = contacts.findIndex((contact) => contact.id === contactId);
 
-//     if (contactIndex === -1) {
-//       return null;
-//     }
+    if (index === -1) {
+      return null;
+    }
 
-//     switch (true) {
-//       case updatedData.name !== undefined:
-//         contacts[contactIndex].name = updatedData.name;
-//         break;
-//       case updatedData.email !== undefined:
-//         contacts[contactIndex].email = updatedData.email;
-//         break;
-//       case updatedData.phone !== undefined:
-//         contacts[contactIndex].phone = updatedData.phone;
-//         break;
-//       default:
-//         break;
-//     }
+    if (data.name !== undefined) {
+      contacts[index].name = data.name;
+    }
+    if (data.email !== undefined) {
+      contacts[index].email = data.email;
+    }
+    if (data.phone !== undefined) {
+      contacts[index].phone = data.phone;
+    }
 
-//     await fs.writeFile(
-//       contactsPath,
-//       JSON.stringify(contacts, null, 2),
-//       "utf-8"
-//     );
-
-//     return contacts[contactIndex];
-//   } catch (error) {
-//     console.log(error.message);
-//     return null;
-//   }
-// }
-
-export async function updateContact(contactId, updatedData) {
-  const contacts = await readFileContacts();
-  const index = contacts.findIndex((contact) => contact.id === contactId);
-
-  if (index === -1) {
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return contacts[index];
+  } catch (error) {
+    console.log(error.message);
     return null;
   }
-
-  contacts[index] = { id, ...data };
-
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return contacts[index];
 }
