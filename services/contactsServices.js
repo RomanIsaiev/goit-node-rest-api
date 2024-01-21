@@ -46,19 +46,7 @@ const updateContactById = async (id, data) => {
     return null;
   }
 
-  switch (true) {
-    case data.name !== undefined:
-      contacts[index].name = data.name;
-      break;
-    case data.email !== undefined:
-      contacts[index].email = data.email;
-      break;
-    case data.phone !== undefined:
-      contacts[index].phone = data.phone;
-      break;
-    default:
-      break;
-  }
+  contacts[index] = { id, ...data };
 
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
   return contacts[index];
