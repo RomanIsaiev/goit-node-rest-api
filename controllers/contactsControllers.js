@@ -1,7 +1,6 @@
-import HttpError from "../helpers/HttpError.js";
-import { ctrlWrapper } from "../helpers/ctrlWrapper.js";
+const { HttpError, ctrlWrapper } = require("../helpers");
 
-import contacts from "../services/contactsServices.js";
+const contacts = require("../services/contactsServices");
 
 const getAllContacts = async (req, res) => {
   const result = await contacts.getAllContacts();
@@ -43,8 +42,10 @@ const updateContactById = async (req, res) => {
   res.json(result);
 };
 
-export const getAll = ctrlWrapper(getAllContacts);
-export const getContact = ctrlWrapper(getContactById);
-export const addContact = ctrlWrapper(createContact);
-export const updateContact = ctrlWrapper(updateContactById);
-export const removeContact = ctrlWrapper(deleteContact);
+module.exports = {
+  getAll: ctrlWrapper(getAllContacts),
+  getContactById: ctrlWrapper(getContactById),
+  addContact: ctrlWrapper(createContact),
+  updateContactById: ctrlWrapper(updateContactById),
+  removeContact: ctrlWrapper(deleteContact),
+};
