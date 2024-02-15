@@ -18,14 +18,11 @@ const transport = nodemailer.createTransport(nodemailerConfig);
 
 const sendEmail = async (data) => {
   const email = { ...data, from: UKR_NET_EMAIL };
-
-  await transport
-    .sendMail(email)
-    .then(() => console.log(`Email to=${data.to} send sucess`))
-    .catch((error) => {
-      console.log(`Wrong send email. ${error.message}`);
-      throw HttpError(404, "Wrong send email");
-    });
+  try {
+    await transport.sendMail(email);
+  } catch (error) {
+    throw HttpError(404, "Wrong send email");
+  }
 };
 
 module.exports = sendEmail;

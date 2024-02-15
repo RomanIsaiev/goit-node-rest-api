@@ -7,13 +7,8 @@ const fs = require("fs/promises");
 const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user");
-const {
-  HttpError,
-  ctrlWrapper,
-  sendEmail,
-  sendVerifyEmail,
-} = require("../helpers");
-const { SECRET_KEY } = require("../config");
+const { HttpError, ctrlWrapper, sendEmail } = require("../helpers");
+const { SECRET_KEY, BASE_URL } = require("../config");
 
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
@@ -36,7 +31,17 @@ const register = async (req, res) => {
     verificationToken,
   });
 
-  await sendEmail(sendVerifyEmail({ email, verificationToken }));
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a 
+      target="_blank" 
+      href="${BASE_URL}/api/auth/verify/${verificationToken}">
+      Click verify email
+      </a>`,
+  };
+
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
     user: {
@@ -70,21 +75,27 @@ const verifyEmail = async (req, res) => {
 
 const resendVerify = async (req, res) => {
   const { email } = req.body;
-  if (!email) {
-    throw HttpError(400, "missing required field email");
-  }
 
   const user = await User.findOne({ email });
   if (!user) {
     throw HttpError(401, "Email not found");
   }
 
-  const { verifyEmail, verificationToken } = user;
-  if (verifyEmail) {
+  if (user.verify) {
     throw HttpError(400, "Verification has already been passed");
   }
 
-  await sendEmail(sendVerifyEmail({ email, verificationToken }));
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a 
+      target="_blank" 
+      href="${BASE_URL}/api/auth/verify/${verificationToken}">
+      Click verify email
+      </a>`,
+  };
+
+  await sendEmail(verifyEmail);
 
   res.json({
     message: `${email} - email resend success`,
@@ -100,8 +111,7 @@ const login = async (req, res) => {
     throw HttpError(401, "Email or password invalid");
   }
 
-  const { verifyEmail } = user;
-  if (!verifyEmail) {
+  if (!user.verifyEmail) {
     throw HttpError(401, "User not verify");
   }
 
